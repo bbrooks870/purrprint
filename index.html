@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PurrPrint — print from your browser to a mini cat printer</title>
+  <meta name="description" content="Print photos, notes, to-do lists and QR codes on your mini Bluetooth thermal printer straight from the browser. No app, no sign-up.">
+  <meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
+  <meta property="og:title" content="PurrPrint — your mini printer, no app needed">
+  <meta property="og:description" content="Photos, notes, lists and QR codes on your mini thermal printer, straight from Chrome.">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@400;700&family=Space+Mono:wght@400;700&family=Playfair+Display:wght@400;700&family=Bungee&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js" defer></script>
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/" aria-label="PurrPrint home">
+      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 20 7 6l10 7h14l10-7-3 14v20a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4Z" fill="var(--accent)"/><path d="M16 28h16M16 34h10" stroke="var(--paper)" stroke-width="3" stroke-linecap="round"/><circle cx="18" cy="21" r="2" fill="var(--paper)"/><circle cx="30" cy="21" r="2" fill="var(--paper)"/></svg>
+      <span>PurrPrint</span>
+    </a>
+    <button id="connect" class="pill" type="button">
+      <span class="dot" aria-hidden="true"></span><span id="connect-label">Connect printer</span>
+    </button>
+  </header>
+
+  <div id="unsupported" class="notice" hidden>
+    <strong>Your browser can't talk to Bluetooth printers.</strong>
+    Open this page in <b>Chrome</b> or <b>Edge</b> on a computer or Android phone.
+    On iPhone/iPad, use the free <b>Bluefy</b> browser app.
+  </div>
+
+  <section class="hero">
+    <h1>Print anything on your mini printer.<br><em>Right from your browser.</em></h1>
+    <p>Photos, notes, to-do lists and QR codes. No app to install, no sign-up, nothing uploaded — everything stays on your device.</p>
+  </section>
+
+  <main class="layout">
+    <div class="editor">
+      <section class="card">
+        <h2><span class="step">1</span> What do you want to print?</h2>
+        <div class="tabs" role="tablist">
+          <button role="tab" data-mode="photo" aria-selected="true">
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 8"/></svg>Photo</button>
+          <button role="tab" data-mode="text" aria-selected="false">
+            <svg viewBox="0 0 24 24"><path d="M5 6h14M12 6v13M9 19h6"/></svg>Text</button>
+          <button role="tab" data-mode="list" aria-selected="false">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="5" rx="1"/><rect x="3" y="14" width="5" height="5" rx="1"/><path d="M11 6.5h10M11 16.5h10"/></svg>Checklist</button>
+          <button role="tab" data-mode="qr" aria-selected="false">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></svg>QR code</button>
+        </div>
+
+        <!-- PHOTO -->
+        <div class="panel" data-panel="photo">
+          <label id="drop" class="drop" tabindex="0">
+            <input id="file" type="file" accept="image/*" hidden>
+            <img id="thumb" alt="" hidden>
+            <span id="drop-hint">
+              <svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+              <b>Choose a photo</b> or drop it here
+              <small>You can also paste an image (Ctrl/⌘ + V)</small>
+            </span>
+          </label>
+          <div class="row">
+            <label class="btn ghost" for="camera"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Take photo
+              <input id="camera" type="file" accept="image/*" capture="environment" hidden></label>
+            <button id="rotate" class="btn ghost" type="button"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-3-6.2M20 4v5h-5"/></svg>Rotate</button>
+          </div>
+        </div>
+
+        <!-- TEXT -->
+        <div class="panel" data-panel="text" hidden>
+          <textarea id="text" rows="5" placeholder="Type your note…">Hello there 👋
+Have a lovely day!</textarea>
+          <div class="chips" id="text-fonts" aria-label="Font"></div>
+          <div class="row wrap">
+            <label class="field grow">Size <input id="text-size" type="range" min="18" max="96" value="40"></label>
+            <div class="seg" id="text-align" aria-label="Alignment">
+              <button type="button" data-v="left" aria-pressed="false" title="Left">⟸</button>
+              <button type="button" data-v="center" aria-pressed="true" title="Center">≡</button>
+              <button type="button" data-v="right" aria-pressed="false" title="Right">⟹</button>
+            </div>
+          </div>
+          <div class="row wrap">
+            <label class="toggle"><input id="text-bold" type="checkbox"> <span>Bold</span></label>
+            <label class="toggle"><input id="text-banner" type="checkbox"> <span>Banner <small>(giant sideways text)</small></span></label>
+            <button id="insert-date" class="btn ghost small" type="button">+ Date &amp; time</button>
+          </div>
+        </div>
+
+        <!-- LIST -->
+        <div class="panel" data-panel="list" hidden>
+          <div class="chips" id="list-presets">
+            <button type="button" data-preset="todo">✅ To-do</button>
+            <button type="button" data-preset="shop">🛒 Shopping</button>
+            <button type="button" data-preset="pack">🧳 Packing</button>
+          </div>
+          <input id="list-title" type="text" placeholder="Title (optional)" value="Today">
+          <textarea id="list-items" rows="6" placeholder="One item per line">Drink water
+Go for a walk
+Call mom
+Finish the project</textarea>
+          <div class="chips" id="list-fonts" aria-label="Font"></div>
+        </div>
+
+        <!-- QR -->
+        <div class="panel" data-panel="qr" hidden>
+          <div class="seg wide" id="qr-kind">
+            <button type="button" data-v="link" aria-pressed="true">Link or text</button>
+            <button type="button" data-v="wifi" aria-pressed="false">Wi-Fi login</button>
+          </div>
+          <div id="qr-link"><input id="qr-data" type="text" placeholder="https://…" value="https://github.com"></div>
+          <div id="qr-wifi" class="row" hidden>
+            <input id="wifi-ssid" type="text" placeholder="Network name">
+            <input id="wifi-pass" type="text" placeholder="Password">
+          </div>
+          <input id="qr-caption" type="text" placeholder="Caption under the code (optional)" value="Scan me!">
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="step">2</span> Make it look right</h2>
+        <p class="label">Style</p>
+        <div class="chips" id="style">
+          <button type="button" data-v="auto" aria-pressed="true">✨ Auto</button>
+          <button type="button" data-v="atkinson" aria-pressed="false">Photo</button>
+          <button type="button" data-v="steinberg" aria-pressed="false">Soft photo</button>
+          <button type="button" data-v="line" aria-pressed="false">Sharp lines</button>
+          <button type="button" data-v="pattern" aria-pressed="false">Comic dots</button>
+        </div>
+        <p id="style-hint" class="hint"></p>
+        <div class="grid2">
+          <label class="field">Brightness <input id="brightness" type="range" min="-100" max="100" value="0"></label>
+          <label class="field">Contrast <input id="contrast" type="range" min="-100" max="100" value="0"></label>
+        </div>
+        <div class="row wrap">
+          <label class="toggle"><input id="invert" type="checkbox"> <span>Invert colours</span></label>
+          <button id="reset-adjust" class="btn ghost small" type="button">Reset</button>
+        </div>
+        <p class="label">Print darkness</p>
+        <div class="seg wide" id="darkness">
+          <button type="button" data-v="1" aria-pressed="false">Light</button>
+          <button type="button" data-v="2" aria-pressed="false">Normal</button>
+          <button type="button" data-v="3" aria-pressed="true">Dark</button>
+          <button type="button" data-v="4" aria-pressed="false">Extra dark</button>
+        </div>
+        <details class="advanced">
+          <summary>Advanced</summary>
+          <label class="field">Print speed <small>(slower = darker)</small><input id="speed" type="range" min="10" max="60" value="30"></label>
+          <label class="toggle"><input id="compress" type="checkbox" checked> <span>Fast transfer <small>(turn off if prints come out garbled)</small></span></label>
+        </details>
+      </section>
+    </div>
+
+    <aside class="output">
+      <div class="paper-wrap">
+        <div class="paper"><canvas id="preview" width="384" height="200" aria-label="Print preview"></canvas></div>
+      </div>
+      <p id="meta" class="meta"></p>
+      <div class="printbar">
+        <div class="copies" aria-label="Copies">
+          <button id="minus" type="button" aria-label="Fewer copies">−</button>
+          <output id="copies">1</output>
+          <button id="plus" type="button" aria-label="More copies">+</button>
+        </div>
+        <button id="print" class="btn primary" type="button">
+          <svg viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"/></svg>
+          <span id="print-label">Print</span>
+          <i id="progress"></i>
+        </button>
+        <button id="feed" class="btn ghost icon" type="button" title="Feed paper" aria-label="Feed paper">
+          <svg viewBox="0 0 24 24"><path d="M12 4v14M6 12l6 6 6-6"/></svg>
+        </button>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </aside>
+  </main>
+
+  <section class="how">
+    <h2>How it works</h2>
+    <ol>
+      <li><b>Turn on your printer</b><span>Make sure no phone app is connected to it.</span></li>
+      <li><b>Tap “Connect printer”</b><span>Pick your printer from the list your browser shows.</span></li>
+      <li><b>Create & print</b><span>What you see on the paper preview is exactly what prints.</span></li>
+    </ol>
+  </section>
+
+  <section class="faq">
+    <h2>Questions</h2>
+    <details><summary>Which printers work?</summary><p>Most mini “cat” thermal printers that use the iPrint, Tiny Print or Fun Print apps — e.g. SC03h, GB01–GB03, GT01, MX05–MX10, YT01, X5/X6 and many unbranded ones. MXW01 printers use a different protocol and are not supported yet.</p></details>
+    <details><summary>Which browsers work?</summary><p>Chrome, Edge, Opera and Samsung Internet on Windows, macOS, ChromeOS, Linux and Android. Safari and Firefox don't support Web Bluetooth — on iPhone/iPad use the Bluefy browser.</p></details>
+    <details><summary>My print is too light.</summary><p>Choose “Extra dark”, or open Advanced and lower the print speed. Charging the printer also helps a lot.</p></details>
+    <details><summary>The printer won't connect.</summary><p>Close the phone app that came with the printer (it can only talk to one device at a time), switch the printer off and on, then try again.</p></details>
+    <details><summary>Are my photos uploaded anywhere?</summary><p>No. Everything is processed in your browser and sent straight to the printer over Bluetooth.</p></details>
+  </section>
+
+  <footer>
+    Made with ♥ · Open source on <a href="https://github.com/bbrooks870/purrprint">GitHub</a> · Protocol work based on <a href="https://github.com/Dejniel/TiMini-Print">TiMini-Print</a>
+  </footer>
+</body>
+</html>

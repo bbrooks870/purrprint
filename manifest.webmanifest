@@ -1,0 +1,10 @@
+{
+  "name": "PurrPrint",
+  "short_name": "PurrPrint",
+  "description": "Print photos, notes, lists and QR codes on your mini thermal printer.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f1e7",
+  "theme_color": "#f6f1e7",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

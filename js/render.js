@@ -145,3 +145,23 @@ export function qr({ data, caption, font = 'clean' }) {
   capLines.forEach((l, i) => ctx.fillText(l, WIDTH / 2, side + PAD * 2 + i * capSize * 1.25));
   return c;
 }
+
+// Short printout to check connection, darkness and dithering in one go.
+export function testPage(printerName, darknessLabel) {
+  const [c, ctx] = canvas(WIDTH, 250);
+  ctx.textAlign = 'center';
+  ctx.font = fontCss('clean', 34, true);
+  ctx.fillText('PurrPrint ✓', WIDTH / 2, PAD);
+  ctx.font = fontCss('clean', 20, false);
+  ctx.fillText(`${printerName} · ${darknessLabel}`, WIDTH / 2, 58);
+  ctx.fillText(new Date().toLocaleString(), WIDTH / 2, 84);
+  const g = ctx.createLinearGradient(PAD, 0, WIDTH - PAD, 0);
+  g.addColorStop(0, '#fff'); g.addColorStop(1, '#000');
+  ctx.fillStyle = g;
+  ctx.fillRect(PAD, 120, WIDTH - PAD * 2, 40); // shading test
+  ctx.fillStyle = '#000';
+  for (let x = PAD; x < WIDTH - PAD; x += 8) ctx.fillRect(x, 172, 4, 24); // fine-line test
+  ctx.font = fontCss('clean', 18, false);
+  ctx.fillText('Your printer is ready 🐱', WIDTH / 2, 212);
+  return c;
+}

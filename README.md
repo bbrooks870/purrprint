@@ -15,7 +15,7 @@ Print photos, notes, checklists and QR codes on a mini Bluetooth "cat" thermal p
 
 ## Supported
 - **Browsers:** Chrome, Edge, Opera, Samsung Internet (Web Bluetooth). iPhone/iPad: the Bluefy browser.
-- **Printers:** cat printers on the `0xAE30` BLE service using the `51 78` command protocol — SC03h, GB01–GB03, GT01, MX05–MX10, YT01, X5/X6 and many unbranded ones. Tested on an SC03h.
+- **Printers:** cat printers on the `0xAE30` BLE service using the `51 78` command protocol. Tested on SC03h; per-model settings (compression, feed, darkness) are picked automatically for GB01–GB03, GT01, MX05–MX10, YT01, X5/X6. MXW01 is not supported.
 
 ## Develop
 No build step — plain HTML, CSS and ES modules.

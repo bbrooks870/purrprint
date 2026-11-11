@@ -1,5 +1,5 @@
 import { WIDTH, buildJob, feedJob } from './protocol.js';
-import { Printer, supported, sleep } from './printer.js';
+import { Printer, UnsupportedPrinter, supported, sleep } from './printer.js';
 import { toGray, dither } from './dither.js';
 import * as R from './render.js';
 
@@ -7,7 +7,6 @@ const $ = (s) => document.querySelector(s);
 const track = (name, params = {}) => { try { window.gtag?.('event', name, params); } catch {} };
 const $$ = (s) => [...document.querySelectorAll(s)];
 
-const DARKNESS = { 1: [10000, 3], 2: [20000, 4], 3: [30000, 5], 4: [40000, 5] }; // [energy, blackening]
 const STYLE_HINTS = {
   auto: 'Picks the best style for you — sharp lines for drawings and codes, smooth shading for photos.',
   atkinson: 'Crisp, high-contrast photos. Best for faces and most pictures.',
@@ -144,6 +143,18 @@ function paintConnection(busy = false) {
 }
 printer.addEventListener('change', () => paintConnection());
 
+// Printer-reported problems. Shown as hints only — never block printing on them.
+let lastWarn = '';
+printer.addEventListener('status', () => {
+  const s = printer.status;
+  const warn = s.outOfPaper ? '📄 The printer says it is out of paper.'
+    : s.coverOpen ? '🔓 The printer lid is open — close it to print.'
+    : s.overheat ? '🔥 The printer is hot — it will continue after cooling down.'
+    : s.lowBattery ? '🔋 Battery is low — charge the printer for darker, reliable prints.' : '';
+  if (warn && warn !== lastWarn) status(warn, true);
+  lastWarn = warn;
+});
+
 async function ensureConnected() {
   if (printer.connected) return true;
   if (!supported()) { $('#unsupported').hidden = false; $('#unsupported').scrollIntoView({ behavior: 'smooth' }); return false; }
@@ -151,12 +162,14 @@ async function ensureConnected() {
     paintConnection(true);
     if (printer.device) await printer.send(new Uint8Array()); // reconnect known device
     else await printer.connect();
-    status(`Connected to ${printer.name} 🎉`);
+    status(`Connected to ${printer.name} 🎉 Try a test print!`);
     track('printer_connected', { printer_model: printer.name });
     return true;
   } catch (e) {
     track('printer_connect_failed', { reason: e.name });
-    status(e.name === 'NotFoundError' ? 'No printer selected.' : 'Could not connect. Turn the printer off and on, close its phone app, and try again.', true);
+    status(e instanceof UnsupportedPrinter
+      ? `${e.message} uses a different protocol that PurrPrint doesn't support yet.`
+      : e.name === 'NotFoundError' ? 'No printer selected.' : 'Could not connect. Turn the printer off and on, close its phone app, and try again.', true);
     return false;
   } finally { paintConnection(); }
 }
@@ -167,38 +180,51 @@ $('#connect').addEventListener('click', async () => {
 });
 
 let printing = false;
-$('#print').addEventListener('click', async () => {
-  if (printing) return;
-  if (!state.bits) { status(state.mode === 'photo' ? 'Choose a photo first.' : 'Nothing to print yet.', true); return; }
-  if (!(await ensureConnected())) return;
+async function printBits(bits, { isText = false, copies = 1 } = {}) {
+  if (printing) return false;
+  if (!(await ensureConnected())) return false;
   printing = true;
   const btn = $('#print'), bar = $('#progress');
   btn.disabled = true;
-  const [energy, blackening] = DARKNESS[state.darkness];
-  const job = buildJob(state.bits, {
-    energy, blackening, speed: +$('#speed').value, compress: $('#compress').checked, isText: state.mode !== 'photo',
+  const job = buildJob(bits, {
+    profile: printer.profile, darkness: state.darkness, speed: +$('#speed').value, compress: $('#compress').checked, isText,
   });
   try {
-    for (let n = 1; n <= state.copies; n++) {
-      $('#print-label').textContent = state.copies > 1 ? `Printing ${n}/${state.copies}…` : 'Printing…';
+    for (let n = 1; n <= copies; n++) {
+      $('#print-label').textContent = copies > 1 ? `Printing ${n}/${copies}…` : 'Printing…';
       await printer.send(job, (p) => (bar.style.width = `${p * 100}%`));
-      if (n < state.copies) await sleep(1500);
+      if (n < copies) await sleep(1500);
     }
     status('Printed! ✨');
-    track('print', { mode: state.mode, style: state.style, darkness: state.darkness, copies: state.copies, printer_model: printer.name });
+    return true;
   } catch (e) {
     console.error(e);
     track('print_failed', { mode: state.mode, reason: e.name });
-    status('Printing stopped — the printer disconnected. Check it is on and try again.', true);
+    status('Printing stopped — the printer disconnected. Check it is on and charged, then try again.', true);
+    return false;
   } finally {
     printing = false; btn.disabled = false; bar.style.width = '0';
     $('#print-label').textContent = 'Print';
   }
+}
+
+$('#print').addEventListener('click', async () => {
+  if (!state.bits) { status(state.mode === 'photo' ? 'Choose a photo first.' : 'Nothing to print yet.', true); return; }
+  if (await printBits(state.bits, { isText: state.mode !== 'photo', copies: state.copies }))
+    track('print', { mode: state.mode, style: state.style, darkness: state.darkness, copies: state.copies, printer_model: printer.name });
+});
+
+$('#test-print').addEventListener('click', async () => {
+  if (!(await ensureConnected())) return;
+  await R.loadFont('clean', true);
+  const c = R.testPage(printer.name, ['Light', 'Normal', 'Dark', 'Extra dark'][state.darkness - 1]);
+  const bits = dither(toGray(c.getContext('2d'), c.width, c.height), c.width, c.height, 'atkinson');
+  if (await printBits(bits)) track('test_print', { printer_model: printer.name, profile: printer.profile.name });
 });
 
 $('#feed').addEventListener('click', async () => {
   if (!(await ensureConnected())) return;
-  try { await printer.send(feedJob(2)); } catch { status('Could not feed paper.', true); }
+  try { await printer.send(feedJob(printer.profile)); } catch { status('Could not feed paper.', true); }
 });
 
 // ---- copies

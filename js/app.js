@@ -4,6 +4,7 @@ import { toGray, dither } from './dither.js';
 import * as R from './render.js';
 
 const $ = (s) => document.querySelector(s);
+const track = (name, params = {}) => { try { window.gtag?.('event', name, params); } catch {} };
 const $$ = (s) => [...document.querySelectorAll(s)];
 
 const DARKNESS = { 1: [10000, 3], 2: [20000, 4], 3: [30000, 5], 4: [40000, 5] }; // [energy, blackening]
@@ -151,8 +152,10 @@ async function ensureConnected() {
     if (printer.device) await printer.send(new Uint8Array()); // reconnect known device
     else await printer.connect();
     status(`Connected to ${printer.name} 🎉`);
+    track('printer_connected', { printer_model: printer.name });
     return true;
   } catch (e) {
+    track('printer_connect_failed', { reason: e.name });
     status(e.name === 'NotFoundError' ? 'No printer selected.' : 'Could not connect. Turn the printer off and on, close its phone app, and try again.', true);
     return false;
   } finally { paintConnection(); }
@@ -182,8 +185,10 @@ $('#print').addEventListener('click', async () => {
       if (n < state.copies) await sleep(1500);
     }
     status('Printed! ✨');
+    track('print', { mode: state.mode, style: state.style, darkness: state.darkness, copies: state.copies, printer_model: printer.name });
   } catch (e) {
     console.error(e);
+    track('print_failed', { mode: state.mode, reason: e.name });
     status('Printing stopped — the printer disconnected. Check it is on and try again.', true);
   } finally {
     printing = false; btn.disabled = false; bar.style.width = '0';

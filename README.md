@@ -1,5 +1,7 @@
 # 🐱 PurrPrint
 
+**Live:** https://purrprint.freeforall.dev
+
 Print photos, notes, checklists and QR codes on a mini Bluetooth "cat" thermal printer — straight from the browser. No app, no sign-up, nothing uploaded.
 
 **Features**

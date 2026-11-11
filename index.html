@@ -3,12 +3,27 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>PurrPrint — print from your browser to a mini cat printer</title>
-  <meta name="description" content="Print photos, notes, to-do lists and QR codes on your mini Bluetooth thermal printer straight from the browser. No app, no sign-up.">
+  <title>PurrPrint – Free Cat Printer App in Your Browser</title>
+  <meta name="description" content="Print photos, notes, lists &amp; QR codes on your mini Bluetooth cat printer (SC03h, GB01, MX10) from Chrome. Free iPrint alternative — no app, no sign-up.">
+  <link rel="canonical" href="https://purrprint.freeforall.dev/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#16151a" media="(prefers-color-scheme: dark)">
-  <meta property="og:title" content="PurrPrint — your mini printer, no app needed">
-  <meta property="og:description" content="Photos, notes, lists and QR codes on your mini thermal printer, straight from Chrome.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PurrPrint">
+  <meta property="og:url" content="https://purrprint.freeforall.dev/">
+  <meta property="og:title" content="PurrPrint – print to your mini cat printer, no app needed">
+  <meta property="og:description" content="Photos, notes, checklists and QR codes on your mini thermal printer, straight from your browser. Free.">
+  <meta property="og:image" content="https://purrprint.freeforall.dev/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="PurrPrint: a phone printing a photo on a mini thermal printer">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PurrPrint – print to your mini cat printer, no app needed">
+  <meta name="twitter:description" content="Photos, notes, checklists and QR codes on your mini thermal printer, straight from your browser. Free.">
+  <meta name="twitter:image" content="https://purrprint.freeforall.dev/og.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <script type="application/ld+json">[{"@context": "https://schema.org", "@type": "WebApplication", "name": "PurrPrint", "url": "https://purrprint.freeforall.dev/", "description": "Free web app to print photos, notes, checklists and QR codes on mini Bluetooth cat thermal printers, right from the browser.", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Windows, macOS, ChromeOS, Linux, Android", "browserRequirements": "Requires a browser with Web Bluetooth (Chrome, Edge, Opera)", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "featureList": ["Print photos with dithering", "Print text notes and banners", "Print checklists", "Print QR codes and Wi-Fi QR codes", "No app or sign-up"], "image": "https://purrprint.freeforall.dev/og.png"}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which printers work with PurrPrint?", "acceptedAnswer": {"@type": "Answer", "text": "Most mini “cat” thermal printers that normally use the iPrint, Tiny Print or Fun Print apps — e.g. SC03h, GB01, GB02, GB03, GT01, MX05–MX10, YT01, X5/X6 and many unbranded 58 mm Bluetooth printers. MXW01 printers use a different protocol and are not supported yet."}}, {"@type": "Question", "name": "Which browsers work?", "acceptedAnswer": {"@type": "Answer", "text": "Chrome, Edge, Opera and Samsung Internet on Windows, macOS, ChromeOS, Linux and Android. Safari and Firefox don't support Web Bluetooth — on iPhone/iPad use the Bluefy browser."}}, {"@type": "Question", "name": "Is PurrPrint an alternative to the iPrint, Tiny Print or Fun Print app?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. PurrPrint talks to the same printers directly from your browser, with no app install, no account and no ads."}}, {"@type": "Question", "name": "My print is too light.", "acceptedAnswer": {"@type": "Answer", "text": "Choose “Extra dark”, or open Advanced and lower the print speed. Charging the printer also helps a lot."}}, {"@type": "Question", "name": "The printer won't connect.", "acceptedAnswer": {"@type": "Answer", "text": "Close the phone app that came with the printer (it can only talk to one device at a time), switch the printer off and on, then try again."}}, {"@type": "Question", "name": "Are my photos uploaded anywhere?", "acceptedAnswer": {"@type": "Answer", "text": "No. Everything is processed in your browser and sent straight to the printer over Bluetooth."}}]}]</script>
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,7 +52,7 @@
 
   <section class="hero">
     <h1>Print anything on your mini printer.<br><em>Right from your browser.</em></h1>
-    <p>Photos, notes, to-do lists and QR codes. No app to install, no sign-up, nothing uploaded — everything stays on your device.</p>
+    <p>The free cat printer app that runs in your browser. Print photos, notes, to-do lists and QR codes on SC03h, GB01, MX10, YT01 and other mini thermal printers — no app to install, no sign-up, nothing uploaded.</p>
   </section>
 
   <main class="layout">
@@ -192,8 +207,9 @@ Finish the project</textarea>
 
   <section class="faq">
     <h2>Questions</h2>
-    <details><summary>Which printers work?</summary><p>Most mini “cat” thermal printers that use the iPrint, Tiny Print or Fun Print apps — e.g. SC03h, GB01–GB03, GT01, MX05–MX10, YT01, X5/X6 and many unbranded ones. MXW01 printers use a different protocol and are not supported yet.</p></details>
+    <details><summary>Which printers work with PurrPrint?</summary><p>Most mini “cat” thermal printers that normally use the iPrint, Tiny Print or Fun Print apps — e.g. SC03h, GB01, GB02, GB03, GT01, MX05–MX10, YT01, X5/X6 and many unbranded 58 mm Bluetooth printers. MXW01 printers use a different protocol and are not supported yet.</p></details>
     <details><summary>Which browsers work?</summary><p>Chrome, Edge, Opera and Samsung Internet on Windows, macOS, ChromeOS, Linux and Android. Safari and Firefox don't support Web Bluetooth — on iPhone/iPad use the Bluefy browser.</p></details>
+    <details><summary>Is PurrPrint an alternative to the iPrint, Tiny Print or Fun Print app?</summary><p>Yes. PurrPrint talks to the same printers directly from your browser, with no app install, no account and no ads.</p></details>
     <details><summary>My print is too light.</summary><p>Choose “Extra dark”, or open Advanced and lower the print speed. Charging the printer also helps a lot.</p></details>
     <details><summary>The printer won't connect.</summary><p>Close the phone app that came with the printer (it can only talk to one device at a time), switch the printer off and on, then try again.</p></details>
     <details><summary>Are my photos uploaded anywhere?</summary><p>No. Everything is processed in your browser and sent straight to the printer over Bluetooth.</p></details>

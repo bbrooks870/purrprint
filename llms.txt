@@ -1,0 +1,10 @@
+# PurrPrint
+
+> Free web app that prints photos, text notes, banners, checklists and QR codes on mini Bluetooth "cat" thermal printers directly from the browser using Web Bluetooth. No install, no account; images never leave the device.
+
+- Works with: SC03h, GB01–GB03, GT01, MX05–MX10, YT01, X5/X6 and other 58 mm printers on the 0xAE30 BLE service (the ones used with the iPrint, Tiny Print and Fun Print apps). MXW01 is not supported.
+- Browsers: Chrome, Edge, Opera, Samsung Internet (desktop and Android). iOS: Bluefy browser.
+- Source: https://github.com/bbrooks870/purrprint (Apache-2.0)
+
+## Pages
+- [PurrPrint app](https://purrprint.freeforall.dev/): the printing tool, FAQ and how-to
